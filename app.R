@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28g"
+app_build <- "2026-08-28h"
 
 app_css <- "
 :root {
@@ -149,10 +149,11 @@ label, .control-label {
   background: var(--gold) !important;
   color: var(--ink) !important;
 }
+/* Choice text sits one step below the group heading above it. */
 .radio label, .checkbox label {
   font-weight: 450;
   color: #cfdcec;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 .form-control[readonly] {
   background: var(--panel-2);
