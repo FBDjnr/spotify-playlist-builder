@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28i"
+app_build <- "2026-08-28j"
 
 app_css <- "
 :root {
@@ -367,26 +367,54 @@ table.dataTable thead .form-control {
   color: var(--muted);
   font-size: 0.95rem;
 }
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-  color: var(--muted) !important;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  margin: 0 2px;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: var(--panel-2) !important;
-  border-color: var(--line) !important;
+/* DataTables emits bare anchors on its own, but li > a inside a Bootstrap page,
+   where Bootstrap's .pagination rules would otherwise own the number's colour.
+   Both shapes are covered so the label always contrasts with its button. */
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dataTables_wrapper .dataTables_paginate .paginate_button > a,
+.dataTables_wrapper .pagination > li > a,
+.dataTables_wrapper .pagination > li > span {
+  background: transparent !important;
+  background-image: none !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 7px !important;
   color: var(--text) !important;
+  margin: 0 2px !important;
+  padding: 5px 12px !important;
+  font-size: 0.95rem;
 }
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover > a,
+.dataTables_wrapper .pagination > li > a:hover,
+.dataTables_wrapper .pagination > li > a:focus {
+  background: var(--panel-2) !important;
+  border-color: #2d5183 !important;
+  color: var(--gold-hi) !important;
+}
+
 .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+.dataTables_wrapper .dataTables_paginate .paginate_button.current > a,
+.dataTables_wrapper .dataTables_paginate .paginate_button.active > a,
+.dataTables_wrapper .pagination > .active > a,
+.dataTables_wrapper .pagination > .active > span,
+.dataTables_wrapper .pagination > .active > a:hover,
+.dataTables_wrapper .pagination > .active > span:hover {
   background: var(--gold) !important;
   border-color: var(--gold) !important;
   color: var(--ink) !important;
+  font-weight: 700;
 }
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled > a,
+.dataTables_wrapper .pagination > .disabled > a,
+.dataTables_wrapper .pagination > .disabled > span {
+  background: transparent !important;
+  border-color: #1d3860 !important;
   color: #4d6a92 !important;
 }
+
 .dataTables_empty {
   color: var(--muted) !important;
   padding: 28px 12px !important;
