@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28d"
+app_build <- "2026-08-28e"
 
 app_css <- "
 :root {
@@ -21,11 +21,16 @@ app_css <- "
   --radius: 10px;
 }
 
+html {
+  font-size: 18px;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .container-fluid {
@@ -61,7 +66,7 @@ hr {
 }
 .app-title h2 {
   margin: 0 0 6px 0;
-  font-size: 1.9rem;
+  font-size: 2rem;
   font-weight: 750;
   color: var(--gold-hi);
 }
@@ -73,13 +78,13 @@ hr {
 
 .quiet-note {
   color: var(--muted);
-  font-size: 0.97rem;
+  font-size: 1rem;
 }
 .step-note {
   color: var(--muted);
-  font-size: 0.97rem;
-  margin: 6px 0 0 0;
-  line-height: 1.5;
+  font-size: 1rem;
+  margin: 8px 0 0 0;
+  line-height: 1.55;
 }
 
 /* Panels */
@@ -91,7 +96,7 @@ hr {
   padding: 18px;
 }
 .sidebar-panel h4 {
-  font-size: 0.88rem;
+  font-size: 0.97rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--muted);
@@ -147,7 +152,7 @@ label, .control-label {
 .radio label, .checkbox label {
   font-weight: 450;
   color: #cfdcec;
-  font-size: 0.97rem;
+  font-size: 1rem;
 }
 .form-control[readonly] {
   background: var(--panel-2);
@@ -163,7 +168,8 @@ label, .control-label {
 .btn {
   border-radius: 999px;
   font-weight: 620;
-  padding: 8px 18px;
+  font-size: 1rem;
+  padding: 9px 19px;
   border: 1px solid var(--line);
   background: var(--panel-2);
   color: var(--text);
@@ -188,8 +194,8 @@ label, .control-label {
   color: var(--ink);
 }
 .btn-sm {
-  padding: 6px 14px;
-  font-size: 0.92rem;
+  padding: 7px 15px;
+  font-size: 1rem;
 }
 
 /* Tabs */
@@ -197,6 +203,7 @@ label, .control-label {
   border-bottom: 1px solid var(--line);
 }
 .nav-tabs > li > a {
+  font-size: 1.02rem;
   color: var(--muted);
   border: none;
   border-bottom: 2px solid transparent;
@@ -233,7 +240,7 @@ label, .control-label {
 }
 .status-box strong {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--muted);
@@ -312,7 +319,7 @@ table.dataTable thead th {
   background: var(--panel-2);
   color: #c3d3e6;
   border-bottom: 1px solid var(--line) !important;
-  font-size: 0.88rem;
+  font-size: 0.98rem;
   letter-spacing: 0.02em;
   font-weight: 700;
   padding: 12px 12px;
@@ -322,7 +329,7 @@ table.dataTable tbody td {
   color: var(--text);
   padding: 11px 12px;
   background: transparent;
-  font-size: 0.97rem;
+  font-size: 1rem;
 }
 table.dataTable tbody tr {
   background: transparent;
@@ -386,7 +393,7 @@ table.dataTable thead .form-control {
 
 .build-stamp {
   color: #5b7a9e;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   text-align: right;
   margin: 26px 0 8px 0;
 }
