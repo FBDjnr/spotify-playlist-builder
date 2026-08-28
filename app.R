@@ -3,6 +3,9 @@ source("functions.R")
 
 oauth_context_store <- new.env(parent = emptyenv())
 
+# Bumped with each release so a bug report can name the exact build it came from.
+app_build <- "2026-08-28c"
+
 app_css <- "
 :root {
   --bg: #081426;
@@ -381,6 +384,13 @@ table.dataTable thead .form-control {
   font-size: 1rem;
 }
 
+.build-stamp {
+  color: #5b7a9e;
+  font-size: 0.85rem;
+  text-align: right;
+  margin: 26px 0 8px 0;
+}
+
 /* File input */
 .input-group .form-control, .input-group-btn .btn {
   border-radius: 7px;
@@ -757,6 +767,10 @@ ui <- shiny::fluidPage(
       shiny::uiOutput("run_summary"),
       DT::DTOutput("match_table")
     )
+  ),
+  shiny::tags$p(
+    class = "build-stamp",
+    paste("Build", app_build)
   )
 )
 
