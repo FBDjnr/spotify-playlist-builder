@@ -45,6 +45,20 @@ user_stop <- function(message) {
   stop(message, call. = FALSE)
 }
 
+# Function: readable_error
+# Description: Renders a caught condition as text that is always safe to show a user.
+readable_error <- function(error) {
+  message <- clean_text(conditionMessage(error))
+
+  if (nzchar(message)) {
+    return(message)
+  }
+
+  # shiny::req() aborts with an empty message. Caught by a tryCatch it would
+  # otherwise reach the screen as a heading with nothing underneath it.
+  "The run stopped before it could finish and Spotify was not contacted. This usually means the selected song source has no songs in it: check that Song source matches the tab you entered songs on, then try again."
+}
+
 # Function: read_uploaded_dataset
 # Description: Reads CSV, TSV, TXT, XLS, or XLSX uploads into a data frame.
 read_uploaded_dataset <- function(path, filename) {

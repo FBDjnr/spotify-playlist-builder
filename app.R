@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28c"
+app_build <- "2026-08-28d"
 
 app_css <- "
 :root {
@@ -793,6 +793,16 @@ server <- function(input, output, session) {
 
   manual_data <- shiny::reactiveVal(empty_manual_data())
 
+  # The sidebar radio and the visible tab drifted apart too easily, which aborted
+  # runs with no visible reason, so follow whichever tab the user moves to.
+  shiny::observeEvent(input$main_tabs, {
+    if (identical(input$main_tabs, "Type songs")) {
+      shiny::updateRadioButtons(session, "song_source", selected = "manual")
+    } else if (identical(input$main_tabs, "Upload dataset")) {
+      shiny::updateRadioButtons(session, "song_source", selected = "upload")
+    }
+  }, ignoreInit = TRUE)
+
   uploaded_data <- shiny::reactive({
     shiny::req(input$song_file)
     read_uploaded_dataset(input$song_file$datapath, input$song_file$name)
@@ -926,7 +936,14 @@ server <- function(input, output, session) {
 
   source_songs <- shiny::reactive({
     if (identical(input$song_source, "upload")) {
-      shiny::req(uploaded_data())
+      if (is.null(input$song_file)) {
+        user_stop(paste(
+          "Song source is set to 'Uploaded dataset' but no file has been uploaded.",
+          "Upload one on the Upload dataset tab, or set Song source to 'Typed spreadsheet'",
+          "if you entered your songs on the Type songs tab."
+        ))
+      }
+
       dataset <- uploaded_data()
       artist_col <- input$artist_col %||% ""
       title_col <- input$title_col %||% ""
@@ -1166,7 +1183,7 @@ server <- function(input, output, session) {
       run_result(NULL)
       shiny::showNotification("Track matching preview is ready.", type = "message")
     }, error = function(error) {
-      shiny::showNotification(conditionMessage(error), type = "error", duration = 10)
+      shiny::showNotification(readable_error(error), type = "error", duration = 12)
     })
   })
 
@@ -1223,8 +1240,9 @@ server <- function(input, output, session) {
       run_result(list(error = NULL, table = result_table))
       shiny::showNotification("Playlist creation finished.", type = "message")
     }, error = function(error) {
-      run_result(list(error = conditionMessage(error), table = NULL))
-      shiny::showNotification(conditionMessage(error), type = "error", duration = 12)
+      explained <- readable_error(error)
+      run_result(list(error = explained, table = NULL))
+      shiny::showNotification(explained, type = "error", duration = 14)
     })
   })
 
