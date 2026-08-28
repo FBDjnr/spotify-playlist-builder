@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28j"
+app_build <- "2026-08-28k"
 
 app_css <- "
 :root {
@@ -362,57 +362,64 @@ table.dataTable thead .form-control {
 }
 .dataTables_wrapper .dataTables_info,
 .dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter,
-.dataTables_wrapper .dataTables_paginate {
+.dataTables_wrapper .dataTables_filter {
   color: var(--muted);
   font-size: 0.95rem;
 }
-/* DataTables emits bare anchors on its own, but li > a inside a Bootstrap page,
-   where Bootstrap's .pagination rules would otherwise own the number's colour.
-   Both shapes are covered so the label always contrasts with its button. */
-.dataTables_wrapper .dataTables_paginate .paginate_button,
-.dataTables_wrapper .dataTables_paginate .paginate_button > a,
-.dataTables_wrapper .pagination > li > a,
-.dataTables_wrapper .pagination > li > span {
+.dataTables_wrapper .dataTables_paginate {
+  font-size: 0.95rem;
+}
+/* DataTables ships `color: inherit !important` on .paginate_button at the same
+   specificity as any rule written here, and htmlwidgets injects its stylesheet
+   after this one, so it wins the tie and the label takes its colour from the
+   container. Adding `body` outranks it. The container colour is set to readable
+   text as well, so an inherit that slips through is still legible. */
+body .dataTables_wrapper .dataTables_paginate,
+body .dataTables_wrapper .dataTables_paginate .paginate_button,
+body .dataTables_wrapper .dataTables_paginate .paginate_button > a,
+body .dataTables_wrapper .pagination > li > a,
+body .dataTables_wrapper .pagination > li > span {
+  color: var(--text) !important;
+}
+
+body .dataTables_wrapper .dataTables_paginate .paginate_button,
+body .dataTables_wrapper .pagination > li > a,
+body .dataTables_wrapper .pagination > li > span {
   background: transparent !important;
   background-image: none !important;
   border: 1px solid var(--line) !important;
   border-radius: 7px !important;
-  color: var(--text) !important;
   margin: 0 2px !important;
   padding: 5px 12px !important;
   font-size: 0.95rem;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover > a,
-.dataTables_wrapper .pagination > li > a:hover,
-.dataTables_wrapper .pagination > li > a:focus {
+body .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+body .dataTables_wrapper .pagination > li > a:hover {
   background: var(--panel-2) !important;
+  background-image: none !important;
   border-color: #2d5183 !important;
   color: var(--gold-hi) !important;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current > a,
-.dataTables_wrapper .dataTables_paginate .paginate_button.active > a,
-.dataTables_wrapper .pagination > .active > a,
-.dataTables_wrapper .pagination > .active > span,
-.dataTables_wrapper .pagination > .active > a:hover,
-.dataTables_wrapper .pagination > .active > span:hover {
+body .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+body .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+body .dataTables_wrapper .pagination > .active > a,
+body .dataTables_wrapper .pagination > .active > span {
   background: var(--gold) !important;
+  background-image: none !important;
   border-color: var(--gold) !important;
   color: var(--ink) !important;
   font-weight: 700;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled > a,
-.dataTables_wrapper .pagination > .disabled > a,
-.dataTables_wrapper .pagination > .disabled > span {
+body .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+body .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+body .dataTables_wrapper .pagination > .disabled > a,
+body .dataTables_wrapper .pagination > .disabled > span {
   background: transparent !important;
   border-color: #1d3860 !important;
-  color: #4d6a92 !important;
+  color: #6f8fb4 !important;
 }
 
 .dataTables_empty {
