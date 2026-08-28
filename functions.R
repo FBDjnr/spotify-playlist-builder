@@ -108,6 +108,9 @@ data_frame_from_rows <- function(rows) {
 # Description: Encodes raw bytes using the URL-safe base64 format required by PKCE.
 base64url_encode <- function(raw_bytes) {
   encoded <- jsonlite::base64_enc(raw_bytes)
+  # jsonlite wraps base64 output at 76 characters. Any newline left in place makes a
+  # PKCE verifier illegal, because the spec allows only [A-Za-z0-9-._~].
+  encoded <- gsub("[[:space:]]", "", encoded)
   encoded <- gsub("+", "-", encoded, fixed = TRUE)
   encoded <- gsub("/", "_", encoded, fixed = TRUE)
   gsub("=+$", "", encoded)
