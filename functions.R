@@ -775,9 +775,11 @@ preflight_existing_playlists <- function(jobs, playlists, current_user_id, exist
     if (identical(existing_policy, "warn") && length(matches) > 0) {
       urls <- vapply(matches, playlist_url, character(1))
       blockers[[length(blockers) + 1]] <- paste0(
-        "Playlist already exists: ",
+        "A playlist named '",
         job$playlist_name,
-        if (length(urls) > 0) paste0(" (", paste(urls[nzchar(urls)], collapse = ", "), ")") else ""
+        "' already exists in your Spotify account",
+        if (any(nzchar(urls))) paste0(" (", paste(urls[nzchar(urls)], collapse = ", "), ")") else "",
+        "."
       )
     }
 
@@ -799,6 +801,14 @@ preflight_existing_playlists <- function(jobs, playlists, current_user_id, exist
   }
 
   if (length(blockers) > 0) {
+    # A bare warning leaves people stuck, so name the ways forward.
+    if (identical(existing_policy, "warn")) {
+      blockers[[length(blockers) + 1]] <- paste(
+        "Nothing has been changed. To continue, set 'If a playlist with the same name exists'",
+        "to 'Include only the new songs' or 'Overwrite it', or choose a different playlist name."
+      )
+    }
+
     user_stop(paste(blockers, collapse = "\n"))
   }
 

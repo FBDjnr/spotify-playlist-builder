@@ -22,7 +22,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .container-fluid {
@@ -70,12 +70,13 @@ hr {
 
 .quiet-note {
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.97rem;
 }
 .step-note {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.97rem;
   margin: 6px 0 0 0;
+  line-height: 1.5;
 }
 
 /* Panels */
@@ -87,7 +88,7 @@ hr {
   padding: 18px;
 }
 .sidebar-panel h4 {
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--muted);
@@ -110,9 +111,10 @@ hr {
 label, .control-label {
   color: var(--text);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
 }
 .form-control, .selectize-input, .copy-field {
+  font-size: 1rem;
   background: var(--panel-2);
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -142,6 +144,7 @@ label, .control-label {
 .radio label, .checkbox label {
   font-weight: 450;
   color: #cfdcec;
+  font-size: 0.97rem;
 }
 .form-control[readonly] {
   background: var(--panel-2);
@@ -182,8 +185,8 @@ label, .control-label {
   color: var(--ink);
 }
 .btn-sm {
-  padding: 5px 13px;
-  font-size: 0.86rem;
+  padding: 6px 14px;
+  font-size: 0.92rem;
 }
 
 /* Tabs */
@@ -227,7 +230,7 @@ label, .control-label {
 }
 .status-box strong {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--muted);
@@ -236,6 +239,9 @@ label, .control-label {
 .status-box p {
   margin: 0;
   color: var(--text);
+  font-size: 1rem;
+  line-height: 1.55;
+  white-space: pre-line;
 }
 .error-box {
   border-left-color: var(--red);
@@ -251,7 +257,7 @@ label, .control-label {
 .copy-field {
   flex: 1 1 auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 .copy-button {
   flex: 0 0 auto;
@@ -262,7 +268,7 @@ code {
   color: var(--gold-hi);
   border-radius: 5px;
   padding: 2px 6px;
-  font-size: 0.88em;
+  font-size: 0.94em;
 }
 
 /* Song entry */
@@ -301,19 +307,19 @@ table.dataTable {
 }
 table.dataTable thead th {
   background: var(--panel-2);
-  color: var(--muted);
+  color: #c3d3e6;
   border-bottom: 1px solid var(--line) !important;
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
   font-weight: 700;
-  padding: 11px 12px;
+  padding: 12px 12px;
 }
 table.dataTable tbody td {
   border-top: 1px solid var(--line);
   color: var(--text);
-  padding: 10px 12px;
+  padding: 11px 12px;
   background: transparent;
+  font-size: 0.97rem;
 }
 table.dataTable tbody tr {
   background: transparent;
@@ -343,8 +349,10 @@ table.dataTable thead .form-control {
 }
 .dataTables_wrapper .dataTables_info,
 .dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter {
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_paginate {
   color: var(--muted);
+  font-size: 0.95rem;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button {
   color: var(--muted) !important;
@@ -370,6 +378,7 @@ table.dataTable thead .form-control {
   color: var(--muted) !important;
   padding: 28px 12px !important;
   font-style: italic;
+  font-size: 1rem;
 }
 
 /* File input */
@@ -385,6 +394,8 @@ table.dataTable thead .form-control {
   width: 380px;
 }
 .shiny-notification {
+  font-size: 0.98rem;
+  line-height: 1.5;
   background: var(--panel-2);
   color: var(--text);
   border: 1px solid var(--line);
