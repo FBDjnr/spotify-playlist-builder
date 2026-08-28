@@ -4,74 +4,400 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 app_css <- "
+:root {
+  --bg: #081426;
+  --panel: #0f2038;
+  --panel-2: #162c4a;
+  --line: #23426b;
+  --text: #eef3fa;
+  --muted: #9db2ce;
+  --gold: #d9ad3c;
+  --gold-hi: #f0c85c;
+  --ink: #0a1a30;
+  --red: #f0748a;
+  --radius: 10px;
+}
+
 body {
-  background: #f7f8f6;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+  font-size: 15px;
 }
+
+.container-fluid {
+  max-width: 1500px;
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--text);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--gold-hi);
+}
+a:hover, a:focus {
+  color: var(--gold);
+}
+
+hr {
+  border-top: 1px solid var(--line);
+}
+
+/* Header */
 .app-title {
-  margin-bottom: 8px;
+  background: linear-gradient(135deg, #16365e 0%, #102844 55%, #0b1c33 100%);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 26px 28px;
+  margin: 6px 0 22px 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
-.sidebar-panel {
-  border-radius: 8px;
+.app-title h2 {
+  margin: 0 0 6px 0;
+  font-size: 1.9rem;
+  font-weight: 750;
+  color: var(--gold-hi);
+}
+.app-title .quiet-note {
+  color: rgba(238, 243, 250, 0.86);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.quiet-note {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.step-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 6px 0 0 0;
+}
+
+/* Panels */
+.well, .sidebar-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: none;
+  padding: 18px;
+}
+.sidebar-panel h4 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+.entry-card, .callout {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.callout {
+  border-left: 3px solid var(--gold);
+}
+
+/* Form controls */
+label, .control-label {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.form-control, .selectize-input, .copy-field {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  box-shadow: none;
+  height: auto;
+  padding: 8px 11px;
+}
+.form-control:focus, .selectize-input.focus, .copy-field:focus {
+  background: var(--panel-2);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(217, 173, 60, 0.22);
+  color: var(--text);
+  outline: none;
+}
+.form-control::placeholder {
+  color: #6b85a8;
+}
+.selectize-input, .selectize-input input, .selectize-dropdown {
+  color: var(--text) !important;
+  background: var(--panel-2) !important;
+}
+.selectize-dropdown .active {
+  background: var(--gold) !important;
+  color: var(--ink) !important;
+}
+.radio label, .checkbox label {
+  font-weight: 450;
+  color: #cfdcec;
+}
+.form-control[readonly] {
+  background: var(--panel-2);
+}
+.progress {
+  background: var(--panel-2);
+}
+.progress-bar {
+  background-color: var(--gold);
+}
+
+/* Buttons */
+.btn {
+  border-radius: 999px;
+  font-weight: 620;
+  padding: 8px 18px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  transition: transform 0.06s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover, .btn:focus {
+  background: #1d3860;
+  color: var(--text);
+  border-color: #2d5183;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary, .btn-success {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+.btn-primary:hover, .btn-primary:focus, .btn-success:hover, .btn-success:focus {
+  background: var(--gold-hi);
+  border-color: var(--gold-hi);
+  color: var(--ink);
+}
+.btn-sm {
+  padding: 5px 13px;
+  font-size: 0.86rem;
+}
+
+/* Tabs */
+.nav-tabs {
+  border-bottom: 1px solid var(--line);
+}
+.nav-tabs > li > a {
+  color: var(--muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-weight: 600;
+  padding: 10px 16px;
+  background: transparent;
+}
+.nav-tabs > li > a:hover {
+  background: transparent;
+  color: var(--text);
+  border-bottom-color: #2d5183;
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  background: transparent;
+  color: var(--text);
+  border: none;
+  border-bottom: 2px solid var(--gold);
 }
 .tab-content {
-  padding-top: 18px;
+  padding-top: 20px;
 }
-.instruction-block {
-  max-width: 900px;
-}
+
+/* Status boxes */
 .status-box {
-  border-left: 4px solid #1db954;
-  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  background: var(--panel);
   padding: 12px 14px;
   margin: 12px 0;
-  border-radius: 4px;
+  border-radius: 8px;
+}
+.status-box strong {
+  display: block;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.status-box p {
+  margin: 0;
+  color: var(--text);
 }
 .error-box {
-  border-left-color: #b00020;
+  border-left-color: var(--red);
 }
-.quiet-note {
-  color: #4b5563;
-  font-size: 0.94rem;
-}
+
+/* Copy row */
 .copy-row {
   display: flex;
   gap: 8px;
-  margin: 8px 0 4px 0;
+  margin: 10px 0 4px 0;
   max-width: 640px;
 }
 .copy-field {
   flex: 1 1 auto;
-  font-family: monospace;
-  font-size: 0.92rem;
-  padding: 7px 9px;
-  border: 1px solid #c9ccc7;
-  border-radius: 4px;
-  background: #ffffff;
-  color: #111827;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
 }
 .copy-button {
   flex: 0 0 auto;
 }
-.callout {
-  background: #ffffff;
-  border-left: 4px solid #1db954;
-  border-radius: 4px;
-  padding: 12px 14px;
-  margin: 0 0 18px 0;
-  max-width: 900px;
+
+code {
+  background: var(--panel-2);
+  color: var(--gold-hi);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 0.88em;
 }
-.step-note {
-  color: #4b5563;
-  font-size: 0.92rem;
-  margin: 4px 0 0 0;
+
+/* Song entry */
+.entry-action {
+  margin-top: 25px;
 }
-.btn-success {
-  background-color: #1db954;
-  border-color: #159b45;
+.entry-action .btn {
+  width: 100%;
 }
-.btn-success:hover, .btn-success:focus {
-  background-color: #169c46;
-  border-color: #12893d;
+.list-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 4px 0 10px 0;
+}
+.list-header h4 {
+  margin: 0;
+}
+.table-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+/* DataTables */
+.dataTables_wrapper {
+  color: var(--muted);
+}
+table.dataTable {
+  background: var(--panel);
+  border-collapse: separate !important;
+  border-spacing: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  width: 100% !important;
+}
+table.dataTable thead th {
+  background: var(--panel-2);
+  color: var(--muted);
+  border-bottom: 1px solid var(--line) !important;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  padding: 11px 12px;
+}
+table.dataTable tbody td {
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 12px;
+  background: transparent;
+}
+table.dataTable tbody tr {
+  background: transparent;
+}
+table.dataTable tbody tr:hover td {
+  background: #14294697;
+}
+table.dataTable tbody tr.selected td {
+  background: rgba(217, 173, 60, 0.16) !important;
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+.editable-grid table.dataTable tbody td {
+  cursor: text;
+}
+.editable-grid table.dataTable tbody td:hover {
+  outline: 1px dashed #3a628f;
+  outline-offset: -3px;
+}
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select,
+table.dataTable thead .form-control {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  padding: 5px 9px;
+}
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+  color: var(--muted);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: var(--muted) !important;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  margin: 0 2px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: var(--panel-2) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: var(--ink) !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  color: #4d6a92 !important;
+}
+.dataTables_empty {
+  color: var(--muted) !important;
+  padding: 28px 12px !important;
+  font-style: italic;
+}
+
+/* File input */
+.input-group .form-control, .input-group-btn .btn {
+  border-radius: 7px;
+}
+.progress.shiny-file-input-progress {
+  background: var(--panel-2);
+}
+
+/* Notifications */
+#shiny-notification-panel {
+  width: 380px;
+}
+.shiny-notification {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  opacity: 1;
+}
+.shiny-notification-error {
+  border-left-color: var(--red);
+}
+.shiny-notification-close {
+  color: var(--muted);
 }
 "
 
@@ -103,6 +429,20 @@ function copySpotifyRedirect(button) {
     done();
   }
 }
+
+$(document).on('keydown', '#entry_artist, #entry_title, #entry_group', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    $('#add_song').click();
+  }
+});
+
+Shiny.addCustomMessageHandler('focusEntry', function(id) {
+  var field = document.getElementById(id);
+  if (field) {
+    field.focus();
+  }
+});
 
 Shiny.addCustomMessageHandler('rememberClientId', function(value) {
   try {
@@ -350,12 +690,56 @@ ui <- shiny::fluidPage(
         ),
         shiny::tabPanel(
           "Type songs",
-          shiny::fluidRow(
-            shiny::column(12, DT::DTOutput("manual_table"))
+          shiny::div(
+            class = "entry-card",
+            shiny::tags$h4("Add a song"),
+            shiny::tags$p(
+              class = "step-note",
+              "Fill in the artist and the song title, then press Add. Songs are added one at a time and appear in the list below."
+            ),
+            shiny::fluidRow(
+              shiny::column(
+                4,
+                shiny::textInput("entry_artist", "Artist or author", value = "", placeholder = "Fleetwood Mac")
+              ),
+              shiny::column(
+                4,
+                shiny::textInput("entry_title", "Song title", value = "", placeholder = "Dreams")
+              ),
+              shiny::column(
+                3,
+                shiny::textInput("entry_group", "Group (optional)", value = "", placeholder = "Road trip")
+              ),
+              shiny::column(
+                1,
+                shiny::div(
+                  class = "entry-action",
+                  shiny::actionButton("add_song", "Add", class = "btn-success")
+                )
+              )
+            ),
+            shiny::tags$p(
+              class = "step-note",
+              "Press Enter from any box to add the song. Group is optional: give songs different group names and you can create one playlist per group."
+            )
           ),
-          shiny::tags$br(),
-          shiny::actionButton("add_manual_row", "Add row"),
-          shiny::actionButton("remove_manual_rows", "Remove selected rows")
+          shiny::div(
+            class = "list-header",
+            shiny::tags$h4(shiny::textOutput("manual_count", inline = TRUE))
+          ),
+          shiny::div(
+            class = "editable-grid",
+            DT::DTOutput("manual_table")
+          ),
+          shiny::div(
+            class = "table-actions",
+            shiny::actionButton("remove_manual_rows", "Remove selected"),
+            shiny::actionButton("clear_manual", "Clear all")
+          ),
+          shiny::tags$p(
+            class = "step-note",
+            "Double-click a cell to correct it. Click a row to select it, then choose Remove selected."
+          )
         )
       ),
       shiny::tags$hr(),
@@ -373,12 +757,16 @@ server <- function(input, output, session) {
   run_result <- shiny::reactiveVal(NULL)
   processed_oauth_state <- shiny::reactiveVal("")
 
-  manual_data <- shiny::reactiveVal(data.frame(
-    artist = rep("", 8),
-    title = rep("", 8),
-    group = rep("", 8),
-    stringsAsFactors = FALSE
-  ))
+  empty_manual_data <- function() {
+    data.frame(
+      artist = character(0),
+      title = character(0),
+      group = character(0),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  manual_data <- shiny::reactiveVal(empty_manual_data())
 
   uploaded_data <- shiny::reactive({
     shiny::req(input$song_file)
@@ -418,10 +806,16 @@ server <- function(input, output, session) {
     )
   })
 
+  output$manual_count <- shiny::renderText({
+    count <- nrow(manual_data())
+    if (count == 0) "No songs added yet" else paste(count, if (count == 1) "song added" else "songs added")
+  })
+
   output$manual_table <- DT::renderDT({
     DT::datatable(
       manual_data(),
       rownames = FALSE,
+      colnames = c("Artist or author", "Song title", "Group"),
       editable = "cell",
       selection = "multiple",
       options = list(
@@ -429,10 +823,14 @@ server <- function(input, output, session) {
         lengthChange = FALSE,
         searching = FALSE,
         ordering = FALSE,
-        scrollX = TRUE
+        scrollX = TRUE,
+        columnDefs = list(list(targets = 2, defaultContent = "")),
+        language = list(
+          emptyTable = "No songs yet. Use the Add a song box above to enter your first one."
+        )
       )
     )
-  })
+  }, server = FALSE)
 
   shiny::observeEvent(input$manual_table_cell_edit, {
     edited <- DT::editData(manual_data(), input$manual_table_cell_edit, rownames = FALSE)
@@ -440,25 +838,55 @@ server <- function(input, output, session) {
     manual_data(edited)
   })
 
-  shiny::observeEvent(input$add_manual_row, {
+  shiny::observeEvent(input$add_song, {
+    artist <- clean_text(input$entry_artist %||% "")
+    title <- clean_text(input$entry_title %||% "")
+    group <- clean_text(input$entry_group %||% "")
+
+    if (!nzchar(artist) || !nzchar(title)) {
+      shiny::showNotification("Enter both an artist and a song title before adding.", type = "error")
+      return()
+    }
+
+    existing <- manual_data()
+    duplicate <- any(
+      normalise_key(existing$artist) == normalise_key(artist) &
+        normalise_key(existing$title) == normalise_key(title)
+    )
+    if (duplicate) {
+      shiny::showNotification("That song is already in the list.", type = "warning")
+      return()
+    }
+
     manual_data(rbind(
-      manual_data(),
-      data.frame(artist = "", title = "", group = "", stringsAsFactors = FALSE)
+      existing,
+      data.frame(artist = artist, title = title, group = group, stringsAsFactors = FALSE)
     ))
+
+    # Keep the group so a run of songs for one playlist can be typed without retyping it.
+    shiny::updateTextInput(session, "entry_artist", value = "")
+    shiny::updateTextInput(session, "entry_title", value = "")
+    session$sendCustomMessage("focusEntry", "entry_artist")
+  })
+
+  shiny::observeEvent(input$clear_manual, {
+    if (nrow(manual_data()) == 0) {
+      shiny::showNotification("The song list is already empty.", type = "message")
+      return()
+    }
+
+    manual_data(empty_manual_data())
+    shiny::showNotification("Song list cleared.", type = "message")
   })
 
   shiny::observeEvent(input$remove_manual_rows, {
     selected <- input$manual_table_rows_selected
     if (length(selected) == 0) {
-      shiny::showNotification("Select one or more spreadsheet rows to remove.", type = "message")
+      shiny::showNotification("Click one or more rows in the list to select them first.", type = "message")
       return()
     }
 
-    remaining <- manual_data()[-selected, , drop = FALSE]
-    if (nrow(remaining) == 0) {
-      remaining <- data.frame(artist = "", title = "", group = "", stringsAsFactors = FALSE)
-    }
-    manual_data(remaining)
+    manual_data(manual_data()[-selected, , drop = FALSE])
   })
 
   output$hasGroup <- shiny::reactive({
