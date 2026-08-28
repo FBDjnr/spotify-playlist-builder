@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28e"
+app_build <- "2026-08-28f"
 
 app_css <- "
 :root {
@@ -22,7 +22,7 @@ app_css <- "
 }
 
 html {
-  font-size: 18px;
+  font-size: 17px;
 }
 
 body {
