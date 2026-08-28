@@ -188,6 +188,30 @@ current_redirect_uri <- function(session) {
   paste0(protocol, "//", hostname, port_part, pathname)
 }
 
+# Function: explain_auth_error
+# Description: Adds an actionable hint to the Spotify sign-in errors users hit most often.
+explain_auth_error <- function(message, redirect_uri = "") {
+  message <- clean_text(message)
+
+  if (grepl("redirect", message, ignore.case = TRUE)) {
+    return(paste0(
+      message,
+      " Your Spotify app's Redirect URIs must contain this exact value: ",
+      redirect_uri,
+      " Open the API setup tab, copy it with the Copy button, and add it in the Spotify dashboard."
+    ))
+  }
+
+  if (grepl("invalid.?client|client.?id", message, ignore.case = TRUE)) {
+    return(paste0(
+      message,
+      " Check that the Client ID was copied in full from your Spotify app's Settings page."
+    ))
+  }
+
+  message
+}
+
 # Function: encode_oauth_context
 # Description: Serialises the OAuth login context so the browser tab can hold it across the Spotify redirect.
 encode_oauth_context <- function(context) {

@@ -24,12 +24,31 @@ and is never written to disk.
 
 ## Using the hosted app
 
-1. Open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and create an app.
-2. In the app's settings, add the hosted app's URL as a **Redirect URI**. The app's
-   "API setup" tab shows the exact string to paste.
-3. Copy the **Client ID** into the app's sidebar and click **Connect to Spotify**.
-4. While your Spotify app is in development mode, only accounts you add under
-   **User Management** can sign in. Add anyone else you want to share it with.
+The app is public and anyone can use it. Spotify requires each person to connect
+through their own free developer app, which takes about three minutes and is a
+one-time setup. Your playlists are always created in your own Spotify account.
+
+1. Open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard),
+   sign in with your normal Spotify account, and click **Create app**. The name and
+   description can be anything; a website is not required.
+2. Paste the hosted app's URL into **Redirect URIs** and click **Add**. The app's
+   **API setup** tab shows the exact string with a Copy button — it must match
+   exactly, trailing slash included.
+3. Under **Which API/SDKs are you planning to use?**, tick **Web API**, accept the
+   terms, and save.
+4. Copy the **Client ID** from your app's Settings page into the sidebar, then click
+   **Connect to Spotify** and approve the permissions.
+
+Your Client ID is remembered in your browser, so you only do this once per device.
+Your own Spotify app stays in development mode, which is fine — you are its only
+user, so there is nothing further to configure.
+
+### Why you need your own Spotify app
+
+A Spotify app in development mode allows at most 25 users, each added by hand in the
+dashboard. Having every visitor bring their own app removes that ceiling entirely, so
+the hosted app can be shared with anyone. It also means each person gets their own
+API rate-limit budget rather than competing for a shared one.
 
 ## Running it locally
 

@@ -33,6 +33,38 @@ body {
   color: #4b5563;
   font-size: 0.94rem;
 }
+.copy-row {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 4px 0;
+  max-width: 640px;
+}
+.copy-field {
+  flex: 1 1 auto;
+  font-family: monospace;
+  font-size: 0.92rem;
+  padding: 7px 9px;
+  border: 1px solid #c9ccc7;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #111827;
+}
+.copy-button {
+  flex: 0 0 auto;
+}
+.callout {
+  background: #ffffff;
+  border-left: 4px solid #1db954;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin: 0 0 18px 0;
+  max-width: 900px;
+}
+.step-note {
+  color: #4b5563;
+  font-size: 0.92rem;
+  margin: 4px 0 0 0;
+}
 .btn-success {
   background-color: #1db954;
   border-color: #159b45;
@@ -45,6 +77,44 @@ body {
 
 oauth_javascript <- "
 var spotifyContextKey = 'spotify_oauth_context';
+var spotifyClientIdKey = 'spotify_client_id';
+
+function copySpotifyRedirect(button) {
+  var field = button.parentNode.querySelector('.copy-field');
+  if (!field) {
+    return;
+  }
+  field.select();
+  var done = function() {
+    var original = button.getAttribute('data-label') || button.innerHTML;
+    button.setAttribute('data-label', original);
+    button.innerHTML = 'Copied';
+    window.setTimeout(function() {
+      button.innerHTML = button.getAttribute('data-label');
+    }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(field.value).then(done, function() {
+      document.execCommand('copy');
+      done();
+    });
+  } else {
+    document.execCommand('copy');
+    done();
+  }
+}
+
+Shiny.addCustomMessageHandler('rememberClientId', function(value) {
+  try {
+    if (value) {
+      window.localStorage.setItem(spotifyClientIdKey, value);
+    } else {
+      window.localStorage.removeItem(spotifyClientIdKey);
+    }
+  } catch (error) {
+    // Storage can be blocked; remembering the Client ID is only a convenience.
+  }
+});
 
 $(document).on('shiny:sessioninitialized', function() {
   var stored = '';
@@ -54,6 +124,14 @@ $(document).on('shiny:sessioninitialized', function() {
     stored = '';
   }
   Shiny.setInputValue('stored_oauth_context', stored, {priority: 'event'});
+
+  var savedClientId = '';
+  try {
+    savedClientId = window.localStorage.getItem(spotifyClientIdKey) || '';
+  } catch (error) {
+    savedClientId = '';
+  }
+  Shiny.setInputValue('stored_client_id', savedClientId, {priority: 'event'});
 });
 
 Shiny.addCustomMessageHandler('storeOauthContext', function(payload) {
@@ -156,29 +234,67 @@ ui <- shiny::fluidPage(
           "API setup",
           shiny::div(
             class = "instruction-block",
-            shiny::tags$h3("Get Spotify API credentials"),
-            shiny::tags$ol(
-              shiny::tags$li(
-                "Open the ",
-                shiny::tags$a(
-                  href = "https://developer.spotify.com/dashboard",
-                  target = "_blank",
-                  "Spotify Developer Dashboard"
-                ),
-                " and sign in."
+            shiny::div(
+              class = "callout",
+              shiny::tags$strong("First time here? This takes about three minutes."),
+              shiny::tags$p(
+                class = "step-note",
+                "Spotify requires every person to connect through their own free developer app. You only do this once. Nothing you create here is shared with anyone else, and playlists are always built in your own Spotify account."
+              )
+            ),
+            shiny::tags$h3("Step 1. Create your Spotify app"),
+            shiny::tags$p(
+              "Open the ",
+              shiny::tags$a(
+                href = "https://developer.spotify.com/dashboard",
+                target = "_blank",
+                rel = "noopener",
+                "Spotify Developer Dashboard"
               ),
-              shiny::tags$li("Create an app. Spotify may ask for an app name, description, website, and API use case."),
-              shiny::tags$li(
-                "In the app settings, add this redirect URI exactly: ",
-                shiny::uiOutput("redirect_uri_hint", inline = TRUE)
-              ),
-              shiny::tags$li("Copy the Client ID into the sidebar. Leave the Client Secret in Spotify's dashboard; this app signs in with PKCE and never asks for it."),
-              shiny::tags$li("Click Connect to Spotify and approve the requested playlist permissions.")
+              " and sign in with your normal Spotify account, then click ",
+              shiny::tags$strong("Create app"),
+              "."
             ),
             shiny::tags$p(
-              class = "quiet-note",
-              "If other Spotify accounts will use an app that is still in development mode, add those accounts in the app's User Management area."
+              class = "step-note",
+              "App name and description can be anything, for example \"My playlist builder\". A website is not required."
             ),
+            shiny::tags$h3("Step 2. Add this redirect URI"),
+            shiny::tags$p(
+              "Paste this into the ",
+              shiny::tags$strong("Redirect URIs"),
+              " box, then click ",
+              shiny::tags$strong("Add"),
+              ":"
+            ),
+            shiny::uiOutput("redirect_uri_hint"),
+            shiny::tags$p(
+              class = "step-note",
+              "It must match exactly, including the trailing slash. A mismatch here is the single most common reason sign-in fails."
+            ),
+            shiny::tags$h3("Step 3. Select the Web API"),
+            shiny::tags$p(
+              "Under ",
+              shiny::tags$strong("Which API/SDKs are you planning to use?"),
+              " tick ",
+              shiny::tags$strong("Web API"),
+              ", accept the terms, and save."
+            ),
+            shiny::tags$h3("Step 4. Copy your Client ID"),
+            shiny::tags$p(
+              "Open your new app's ",
+              shiny::tags$strong("Settings"),
+              ", copy the ",
+              shiny::tags$strong("Client ID"),
+              ", and paste it into the sidebar on the left. Then click ",
+              shiny::tags$strong("Connect to Spotify"),
+              " and approve the permissions."
+            ),
+            shiny::tags$p(
+              class = "step-note",
+              "Leave the Client Secret where it is. This app signs in with PKCE and never asks for it. Your Client ID is remembered in this browser so you can skip these steps next time."
+            ),
+            shiny::tags$hr(),
             shiny::tags$h4("Permissions this app requests"),
             shiny::tags$ul(
               shiny::tags$li(
@@ -198,9 +314,23 @@ ui <- shiny::fluidPage(
                 " to identify your Spotify account for playlist ownership checks."
               )
             ),
+            shiny::tags$h4("Common problems"),
+            shiny::tags$ul(
+              shiny::tags$li(
+                shiny::tags$strong("INVALID_CLIENT: Invalid redirect URI"),
+                " means the value in step 2 does not match. Re-copy it with the button above and check for a missing trailing slash."
+              ),
+              shiny::tags$li(
+                shiny::tags$strong("INVALID_CLIENT: Invalid client"),
+                " means the Client ID was mistyped or truncated. Copy it again from your app's Settings page."
+              ),
+              shiny::tags$li(
+                "Your own app starts in development mode, which is fine. You are its only user, so there is nothing to configure."
+              )
+            ),
             shiny::tags$p(
               class = "quiet-note",
-              "Your Client ID is used only to complete your own Spotify sign-in for this session. Nothing is written to disk, and the app never asks for your client secret."
+              "Your Client ID is used only to complete your own Spotify sign-in and is stored in your browser, not on the server. Nothing is written to disk, and the app never asks for your client secret."
             )
           )
         ),
@@ -404,8 +534,34 @@ server <- function(input, output, session) {
   }, once = TRUE, ignoreNULL = TRUE)
 
   output$redirect_uri_hint <- shiny::renderUI({
-    shiny::tags$code(current_redirect_uri(session))
+    shiny::div(
+      class = "copy-row",
+      shiny::tags$input(
+        type = "text",
+        class = "copy-field",
+        readonly = NA,
+        value = current_redirect_uri(session),
+        onclick = "this.select();"
+      ),
+      shiny::tags$button(
+        type = "button",
+        class = "btn btn-default copy-button",
+        onclick = "copySpotifyRedirect(this);",
+        "Copy"
+      )
+    )
   })
+
+  # Returning visitors should not have to re-paste a Client ID that is not secret.
+  # Skip the restore mid-login so it cannot overwrite the value carried through OAuth.
+  shiny::observeEvent(input$stored_client_id, {
+    saved <- clean_text(input$stored_client_id %||% "")
+    mid_login <- nzchar(parse_oauth_query(session$clientData$url_search)$code %||% "")
+
+    if (nzchar(saved) && !mid_login && !nzchar(clean_text(input$client_id %||% ""))) {
+      shiny::updateTextInput(session, "client_id", value = saved)
+    }
+  }, once = TRUE, ignoreNULL = TRUE)
 
   shiny::observe({
     query <- parse_oauth_query(session$clientData$url_search)
@@ -484,8 +640,9 @@ server <- function(input, output, session) {
       drop_oauth_context(oauth_context_store, state)
       spotify_token(NULL)
       spotify_user(NULL)
-      auth_message(conditionMessage(error))
-      shiny::showNotification(conditionMessage(error), type = "error", duration = 10)
+      explained <- explain_auth_error(conditionMessage(error), context$redirect_uri %||% "")
+      auth_message(explained)
+      shiny::showNotification(explained, type = "error", duration = 14)
     })
 
     NULL
@@ -521,6 +678,7 @@ server <- function(input, output, session) {
 
     store_oauth_context(oauth_context_store, state, context)
     session$sendCustomMessage("storeOauthContext", encode_oauth_context(context))
+    session$sendCustomMessage("rememberClientId", client_id)
 
     authorize_url <- build_spotify_authorize_url(
       client_id = client_id,
@@ -538,7 +696,13 @@ server <- function(input, output, session) {
     shiny::div(
       class = if (connected) "status-box" else "status-box error-box",
       shiny::tags$strong(if (connected) "Status" else "Not connected"),
-      shiny::tags$p(auth_message())
+      shiny::tags$p(auth_message()),
+      if (!connected) {
+        shiny::tags$p(
+          class = "quiet-note",
+          "New here? Open the API setup tab for a short walkthrough."
+        )
+      }
     )
   })
 
