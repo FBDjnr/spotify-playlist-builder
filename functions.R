@@ -290,7 +290,7 @@ first_nonblank <- function(...) {
 
 # Function: spotify_error_message
 # Description: Extracts a readable error message from a Spotify API response.
-spotify_error_message <- function(response_body, status_code) {
+spotify_error_message <- function(response_body, status_code, operation = "", authenticated = FALSE) {
   spotify_error <- response_body[["error"]] %||% NULL
   spotify_error_message <- if (is.list(spotify_error)) {
     spotify_error[["message"]] %||% ""
@@ -308,7 +308,33 @@ spotify_error_message <- function(response_body, status_code) {
     "Spotify API request failed."
   )
 
-  paste0("Spotify API error ", status_code, ": ", api_message)
+  step <- if (nzchar(operation)) paste0(" while ", operation) else ""
+
+  # An expired token is the most common failure in a long session, and the raw
+  # message does not tell people that signing in again is all it takes.
+  if (authenticated && status_code == 401) {
+    return(paste0(
+      "Your Spotify sign-in expired", step,
+      ". Click Connect to Spotify in the sidebar to sign in again, then retry. (", api_message, ")"
+    ))
+  }
+
+  if (authenticated && status_code == 403) {
+    return(paste0(
+      "Spotify refused the request", step,
+      ". This usually means the sign-in did not include the playlist permissions. Click Connect to Spotify",
+      " and approve every permission it asks for. (", api_message, ")"
+    ))
+  }
+
+  if (status_code == 429) {
+    return(paste0(
+      "Spotify is rate limiting this app", step,
+      ". Wait a minute and try again. (", api_message, ")"
+    ))
+  }
+
+  paste0("Spotify API error ", status_code, step, ": ", api_message)
 }
 
 # Function: parse_response_body
@@ -326,7 +352,7 @@ parse_response_body <- function(response_text) {
 
 # Function: perform_json_request
 # Description: Performs an httr2 request and parses the JSON response while preserving Spotify errors.
-perform_json_request <- function(request) {
+perform_json_request <- function(request, operation = "", authenticated = FALSE) {
   request <- httr2::req_retry(request, max_tries = 3)
   request <- httr2::req_error(request, is_error = function(response) FALSE)
 
@@ -337,7 +363,7 @@ perform_json_request <- function(request) {
   response_body <- parse_response_body(response_text)
 
   if (status_code >= 300) {
-    user_stop(spotify_error_message(response_body, status_code))
+    user_stop(spotify_error_message(response_body, status_code, operation, authenticated))
   }
 
   if (!is.null(response_body[[".raw_body"]])) {
@@ -368,12 +394,12 @@ request_spotify_token <- function(client_id, client_secret, redirect_uri, code, 
   }
 
   request <- do.call(httr2::req_body_form, c(list(request), body))
-  perform_json_request(request)
+  perform_json_request(request, operation = "completing the Spotify sign-in")
 }
 
 # Function: spotify_api
 # Description: Sends authenticated requests to Spotify's Web API and returns parsed JSON.
-spotify_api <- function(token, method, path, query = list(), body = NULL) {
+spotify_api <- function(token, method, path, query = list(), body = NULL, operation = "") {
   request <- httr2::request(paste0(api_base_url, path))
   request <- httr2::req_auth_bearer_token(request, token$access_token)
   request <- httr2::req_headers(
@@ -392,7 +418,7 @@ spotify_api <- function(token, method, path, query = list(), body = NULL) {
   }
 
   request <- httr2::req_method(request, method)
-  perform_json_request(request)
+  perform_json_request(request, operation = operation, authenticated = TRUE)
 }
 
 # Function: escape_spotify_search
@@ -479,6 +505,7 @@ search_spotify_track <- function(token, artist, title, filter_explicit) {
       token,
       "GET",
       "/search",
+      operation = "searching Spotify for a track",
       query = list(q = query, type = "track", limit = 10)
     )
 
@@ -579,7 +606,7 @@ build_match_preview <- function(token, songs, filter_explicit) {
 # Function: get_current_user
 # Description: Gets the authorized Spotify profile used for display and playlist ownership checks.
 get_current_user <- function(token) {
-  spotify_api(token, "GET", "/me")
+  spotify_api(token, "GET", "/me", operation = "reading your Spotify profile")
 }
 
 # Function: get_current_user_playlists
@@ -593,6 +620,7 @@ get_current_user_playlists <- function(token) {
       token,
       "GET",
       "/me/playlists",
+      operation = "listing your playlists",
       query = list(limit = 50, offset = offset)
     )
 
@@ -620,6 +648,7 @@ get_playlist_track_uris <- function(token, playlist_id) {
       token,
       "GET",
       paste0("/playlists/", playlist_id, "/tracks"),
+      operation = "reading the existing playlist",
       query = list(
         limit = 50,
         offset = offset,
@@ -656,6 +685,7 @@ create_playlist <- function(token, playlist_name, public) {
     token,
     "POST",
     "/me/playlists",
+    operation = "creating the playlist",
     body = list(
       name = playlist_name,
       public = public,
@@ -677,6 +707,7 @@ add_playlist_items <- function(token, playlist_id, uris) {
       token,
       "POST",
       paste0("/playlists/", playlist_id, "/tracks"),
+      operation = "adding tracks to the playlist",
       # I() keeps a one-element batch a JSON array. Without it auto_unbox collapses
       # it to a bare string and Spotify answers "No uris provided".
       body = list(uris = I(unname(chunk)))
@@ -694,6 +725,7 @@ replace_playlist_items <- function(token, playlist_id, uris) {
     token,
     "PUT",
     paste0("/playlists/", playlist_id, "/tracks"),
+    operation = "replacing the playlist contents",
     body = list(uris = I(unname(first_chunk)))
   )
 
