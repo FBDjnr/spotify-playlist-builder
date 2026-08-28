@@ -1,0 +1,14 @@
+# R session files
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+
+# OAuth / credential material — never commit these
+.httr-oauth
+*Credentials*.txt
+.Renviron
+rsconnect/
+
+# Logs
+*.log
