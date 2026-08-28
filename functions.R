@@ -619,17 +619,17 @@ get_playlist_track_uris <- function(token, playlist_id) {
     page <- spotify_api(
       token,
       "GET",
-      paste0("/playlists/", playlist_id, "/items"),
+      paste0("/playlists/", playlist_id, "/tracks"),
       query = list(
         limit = 50,
         offset = offset,
-        fields = "total,limit,offset,next,items(item(uri,type))"
+        fields = "total,limit,offset,next,items(track(uri,type))"
       )
     )
 
     items <- page$items %||% list()
     new_uris <- vapply(items, function(item) {
-      track <- item$item %||% item$track %||% list()
+      track <- item$track %||% item$item %||% list()
       if (identical(track$type %||% "", "track")) {
         track$uri %||% ""
       } else {
@@ -676,8 +676,10 @@ add_playlist_items <- function(token, playlist_id, uris) {
     spotify_api(
       token,
       "POST",
-      paste0("/playlists/", playlist_id, "/items"),
-      body = list(uris = unname(chunk))
+      paste0("/playlists/", playlist_id, "/tracks"),
+      # I() keeps a one-element batch a JSON array. Without it auto_unbox collapses
+      # it to a bare string and Spotify answers "No uris provided".
+      body = list(uris = I(unname(chunk)))
     )
   }
 
@@ -691,8 +693,8 @@ replace_playlist_items <- function(token, playlist_id, uris) {
   spotify_api(
     token,
     "PUT",
-    paste0("/playlists/", playlist_id, "/items"),
-    body = list(uris = unname(first_chunk))
+    paste0("/playlists/", playlist_id, "/tracks"),
+    body = list(uris = I(unname(first_chunk)))
   )
 
   if (length(uris) > 100) {
