@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28h"
+app_build <- "2026-08-28i"
 
 app_css <- "
 :root {
@@ -252,7 +252,9 @@ label, .control-label {
   color: var(--text);
   font-size: 1rem;
   line-height: 1.55;
-  white-space: pre-line;
+}
+.status-box p + p {
+  margin-top: 8px;
 }
 .error-box {
   border-left-color: var(--red);
@@ -1261,11 +1263,16 @@ server <- function(input, output, session) {
     summary_bits <- list()
 
     if (!is.null(result) && !is.null(result$error)) {
+      # Some messages carry several sentences separated by newlines. Give each its
+      # own paragraph rather than relying on whitespace handling in CSS.
+      error_lines <- unlist(strsplit(result$error, "\n", fixed = TRUE))
+      error_lines <- error_lines[nzchar(trimws(error_lines))]
+
       summary_bits <- c(summary_bits, list(
         shiny::div(
           class = "status-box error-box",
           shiny::tags$strong("Playlist not created"),
-          shiny::tags$p(result$error)
+          lapply(error_lines, shiny::tags$p)
         )
       ))
     }
@@ -1275,11 +1282,8 @@ server <- function(input, output, session) {
         row <- result$table[index, , drop = FALSE]
         shiny::tags$li(
           shiny::tags$strong(row$playlist_name),
-          ": ",
-          row$action,
-          ", ",
-          row$tracks_added,
-          " tracks added. ",
+          paste0(": ", row$action, ", ", row$tracks_added,
+                 if (row$tracks_added == 1) " track added. " else " tracks added. "),
           shiny::tags$a(href = row$playlist_url, target = "_blank", "Open playlist")
         )
       })
@@ -1302,14 +1306,11 @@ server <- function(input, output, session) {
         shiny::div(
           class = "status-box",
           shiny::tags$strong("Latest match preview"),
-          shiny::tags$p(
-            matched_count,
-            " matched, ",
-            no_match_count,
-            " not found, ",
-            filtered_count,
-            " filtered for explicit content."
-          )
+          shiny::tags$p(paste0(
+            matched_count, " matched, ",
+            no_match_count, " not found, ",
+            filtered_count, " filtered for explicit content."
+          ))
         )
       ))
     }
