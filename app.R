@@ -4,7 +4,7 @@ source("functions.R")
 oauth_context_store <- new.env(parent = emptyenv())
 
 # Bumped with each release so a bug report can name the exact build it came from.
-app_build <- "2026-08-28k"
+app_build <- "2026-08-31a"
 
 app_css <- "
 :root {
@@ -649,17 +649,27 @@ ui <- shiny::fluidPage(
               )
             ),
             shiny::tags$h3("Step 1. Create your Spotify app"),
-            shiny::tags$p(
-              "Open the ",
-              shiny::tags$a(
-                href = "https://developer.spotify.com/dashboard",
-                target = "_blank",
-                rel = "noopener",
-                "Spotify Developer Dashboard"
+            shiny::tags$ol(
+              shiny::tags$li(
+                "Open the ",
+                shiny::tags$a(
+                  href = "https://developer.spotify.com/dashboard",
+                  target = "_blank",
+                  rel = "noopener",
+                  "Spotify Developer Dashboard"
+                ),
+                " and sign in with your normal Spotify account."
               ),
-              " and sign in with your normal Spotify account, then click ",
-              shiny::tags$strong("Create app"),
-              "."
+              shiny::tags$li(
+                "Click your profile in the top right corner, then choose ",
+                shiny::tags$strong("Dashboard"),
+                "."
+              ),
+              shiny::tags$li(
+                "Click ",
+                shiny::tags$strong("Create app"),
+                "."
+              )
             ),
             shiny::tags$p(
               class = "step-note",

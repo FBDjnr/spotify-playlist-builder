@@ -28,9 +28,10 @@ The app is public and anyone can use it. Spotify requires each person to connect
 through their own free developer app, which takes about three minutes and is a
 one-time setup. Your playlists are always created in your own Spotify account.
 
-1. Open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard),
-   sign in with your normal Spotify account, and click **Create app**. The name and
-   description can be anything; a website is not required.
+1. Open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and
+   sign in with your normal Spotify account. Click your profile in the top right
+   corner, choose **Dashboard**, then click **Create app**. The name and description
+   can be anything; a website is not required.
 2. Paste the hosted app's URL into **Redirect URIs** and click **Add**. The app's
    **API setup** tab shows the exact string with a Copy button — it must match
    exactly, trailing slash included.
